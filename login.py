@@ -31,42 +31,53 @@ def login():
 
     # move to friends tab
     driver.find_elements_by_class_name("rAUz7")[1].click()
-
     sleep(randint(5, 10))
 
     # print some text in search input box
-    driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[1]/div/label/input').send_keys('nikolai')
-
+    driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[1]/div/label/input').send_keys('איילון שפירא')
     sleep(randint(5, 10))
 
-    # row of user
-    # elem = driver.find_elements_by_class_name("_2wP_Y")[1].find_element_by_tag_name('div').find_element_by_class_name("_2EXPL")
-    # print(elem.get_attribute("outerHTML"))
+    if len(driver.find_elements_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]')) == 0:
+        no_contact_found = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]').text
+        print(no_contact_found)
+    else:
+        all_row_text = driver.find_element_by_xpath(
+            '//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div/div/div/div/div/div').text
+        print("all_row_text:", all_row_text)
+        if "\n" in all_row_text:
+            contact_name, status_text = all_row_text.splitlines()
+        else:
+            contact_name, status_text = all_row_text, ""
+        print("contact name:", contact_name)
+        print("status text:", status_text)
 
-    src_pic = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div/div/div/div/div/div/div[1]/div/img').get_attribute("outerHTML")
-    good_url = handle_image_url(src_pic)
-
-    print(good_url)
-
-    sleep(randint(5, 10))
-
-    driver.execute_script('''window.open("''' + good_url + '''","_blank");''')
-    sleep(randint(5, 10))
-    driver.switch_to.window(driver.window_handles[1])
-    sleep(randint(5, 10))
-    urllib.request.urlretrieve(driver.current_url, "local-filename.jpg")
-    sleep(randint(5, 10))
-    driver.execute_script('''window.close();''')
-    sleep(randint(5, 10))
-    driver.switch_to.window(driver.window_handles[0])
-
-    driver.find_element_by_xpath(
-        '//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[1]/div/label/input').clear()
-    driver.find_element_by_xpath(
+        if driver.find_elements_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div/div/div/div/div/div/div[1]/div/img') == 0:
+            src_pic = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div/div/div/div/div/div/div[1]/div/img').get_attribute("outerHTML")
+            good_url = handle_image_url(src_pic)
+            print(good_url)
+            sleep(randint(5, 10))
+            # open the picture in new tab
+            driver.execute_script('''window.open("''' + good_url + '''","_blank");''')
+            sleep(randint(5, 10))
+            driver.switch_to.window(driver.window_handles[1])
+            sleep(randint(5, 10))
+            # make screenshot
+            driver.save_screenshot("yo.jpeg")
+            sleep(randint(5, 10))
+            # close the new tab
+            driver.execute_script('''window.close();''')
+            sleep(randint(5, 10))
+            driver.switch_to.window(driver.window_handles[0])
+        else:
+            print("not found photo")
+        driver.find_element_by_xpath(
+            '//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[1]/div/label/input').clear()
+        driver.find_element_by_xpath(
         '//*[@id="app"]/div/div/div[2]/div[1]/span/div/span/div/div[1]/div/label/input').send_keys('macabi zona')
 
-    # download_image(good_url)
-    print("DOWNLOADED")
+        # download_image(good_url)
+        print("DOWNLOADED")
+
 
     input()
 
