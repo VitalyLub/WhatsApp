@@ -2,9 +2,12 @@ import sys
 import csv
 import pandas as pd
 from datetime import datetime
+import ntpath
 
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
 
-path = "/cs/usr/vitaly92/Desktop/rowdata.csv"
 
 def header(msg):
     print("*" * 50)
@@ -48,7 +51,7 @@ def parse_line(line):
 
 def main(argv):
     # reading the file
-    with open(path, 'r', encoding="ISO-8859-1") as f:
+    with open(argv[1], 'r', encoding="ISO-8859-1") as f:
         mess_data = f.readlines()
  
     print(len(mess_data))
@@ -65,16 +68,18 @@ def main(argv):
 
     print("Clean data amount rows:", len(df1))
     
-    #WORK:
+    # statistics about amount of users:
     filtered_by_isfound = df1.groupby(['is_found'])['phone_number'].agg('count')
     print(filtered_by_isfound)
     
+    # most populat status
     by_status = df1[df1.is_found > -1]
+    by_status = by_status[by_status['status'].str.len() >= 1]
     founded_contacts_amount = len(by_status)
     by_status = by_status.groupby(['status']).size().reset_index(name='count')
     by_status = by_status.sort_values(['count','status'], ascending=[False, True])
     by_status['perc'] = (by_status['count'] / founded_contacts_amount) * 100
-    print(by_status)
+    by_status.to_csv("/cs/usr/vitaly92/Desktop/by_status_" + path_leaf(argv[1]), sep='\t', encoding="utf-8")
     
 
 if __name__ == "__main__":
